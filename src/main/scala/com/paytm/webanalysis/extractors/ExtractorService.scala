@@ -2,14 +2,26 @@ package com.paytm.webanalysis.extractors
 
 import com.paytm.webanalysis.config.ExtractorConfig
 import com.paytm.webanalysis.utils.Utils
+import org.apache.spark.internal.Logging
 import org.apache.spark.sql.DataFrame
 
+/**
+ * @author: Arulkumar Lingan
+ * ExtractorService is a contract for extractor
+ */
 trait ExtractorService {
-  def extractor(config: ExtractorConfig)
+  def extractor(config: ExtractorConfig): DataFrame
 }
 
-final class DefaultExtractorService extends ExtractorService with ExtractorFunctions {
+/**
+ * @author: Arulkumar Lingan
+ * DefaultExtractorService used as a default extractor service implementation
+ */
+final class DefaultExtractorService extends ExtractorService with ExtractorFunctions with Logging {
   override def extractor(config: ExtractorConfig) = {
-    Utils.addDataFrame(config.dataFrameName, getExtractor(config)(config))
+    logInfo("Running extractor for -> " + config)
+    val dataFrame = getExtractor(config)(config)
+    Utils.addDataFrame(config.dataFrameName, dataFrame)
+    dataFrame
   }
 }
